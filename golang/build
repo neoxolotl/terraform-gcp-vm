@@ -1,0 +1,5 @@
+echo "-----------------------Building Image Golang------------------------- "
+docker build -t migolang:latest .
+docker run -it migolang:latest
+docker ps
+

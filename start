@@ -1,0 +1,117 @@
+#!/bin/bash
+###############
+while [[ $# > 0 ]]
+do
+       case "$1" in
+                CREATE)
+                #./start CREATE credentials.json project_id region_
+                        echo "CREATE"
+                                echo "Crear provider"
+echo '
+provider "google" {
+  credentials = "${file("'$2'")}"
+  project = "'$3'"
+  region = "'$4'"
+}' > provider.tf 
+echo "Crear variables"
+echo '		
+variable "name" {
+  default = "demo-cluster"
+}
+variable "project" {
+  default = "'$3'"
+}
+variable "location" {
+  default = "'$4'"
+}
+variable "initial_node_count" {
+  default = 1
+}
+variable "machine_type" {
+  default = "n1-standard-1"
+}
+' > variables.tf
+                terraform init 
+                terraform plan 
+                terraform apply 
+                gcloud container clusters get-credentials demo-cluster --zone='$4'
+                cd app 
+                kubectl apply -f deployment.yaml
+                kubectl apply -f 12service.yaml
+                kubectl apply -f 12ingress.yaml
+                sleep 420
+                kubectl get ing                                
+			shift 
+                        ;;
+                DESTROY)
+                       echo "Destroy"
+                        terraform destroy
+			shift
+                       ;;
+                OUTPUT)
+                        echo "Output"
+                        curl "'$2':'$3'"
+			shift
+                        ;;
+                -help) 
+                        echo "
+Error : Entre un parametro valido  
+-------
+	Debe seleccionar alguno de los parametros CREATE DESTROY OUTPUT 
+        Para crear un cluster en Kubernetes con su respectivo service del tipo NodePort y su Ingress.
+
+
+
+
+CREATE (Crea cluster) Y además debe ir acompañado por los parametros credentials.json project_id region
+        Donde credentials.json corresponde a las credenciales de acceso GCP además debe colocar el 
+        archivo de credenciales.json respectivo en esta ruta donde esta este ejecutable
+
+        Ejemplos: 
+                ./start CREATE credenciales_proyecto3322.json proyecto3322 us-central1
+                ./start CREATE credentials.json proyecto11 us-west1-b
+                ./start CREATE core-catalyst-283702-30950e2a8fd2.json core-catalyst-283702 us-central1
+
+DESTROY (Destruye el cluster)
+        Destruye el cluster con los parametros previamente cargados correspondientes a
+        provider.tf 
+        variables.tf 
+
+        Ejemplo:
+                ./start DESTROY 
+
+OUTPUT (Salida  )
+        Va a mostrar la salida del comando básicamente funciona con curl 
+
+        Ejemplos
+                ./start OUTPUT  http://ip  (for hello World )
+                ./start OUTPUT  http://ip/square/2 (for square 2 )
+                ./start OUTPUT  http://ip/greetings (hello world form localhost)
+
+        You can show the api contents 
+        curl http://ip  (for hello World )
+        curl http://ip/square/2 (for square 2 )
+
+IMPORTANTE:
+-----------
+        Tenga presente los siguientes requerimientos. 
+- Terraform versión v0.12.26.
+- Cuenta en GCP.
+- Crear una cuenta de servicios y crear una clave del tipo JSON. descargada y guardada en el proyecto
+- Herramientas kubectl 
+
+        Puede instalarlos metiante los script:
+        sudo ./tf_Linux
+        ./tf_MacOS
+"
+						shift
+                        ;;
+        esac
+        shift
+
+done
+
+
+
+
+

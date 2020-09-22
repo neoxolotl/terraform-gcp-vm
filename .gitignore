@@ -1,0 +1,8 @@
+*terraform
+*.json
+variables.*
+provider.*
+*(copia).*
+*.bkp
+*.swp
+
