@@ -50,10 +50,3 @@ data "google_compute_image" "my_image" {
   project = "debian-cloud"
 }
 
-resource "google_compute_disk" "foobar" {
-  name  = "existing-disk"
-  image = data.google_compute_image.my_image.self_link
-  size  = 10
-  type  = "pd-ssd"
-  zone  = "us-central1-a"
-}
