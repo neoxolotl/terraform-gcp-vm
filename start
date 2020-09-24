@@ -33,7 +33,7 @@ variable "machine_type" {
 ' > variables.tf
                 terraform init 
                 terraform plan 
-                terraform apply 
+                terraform apply -auto-approve 
                 gcloud container clusters get-credentials demo-cluster --zone='$4'
                 cd app 
                 kubectl apply -f deployment.yaml
