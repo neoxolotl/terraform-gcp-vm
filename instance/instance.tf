@@ -1,52 +1,28 @@
-resource "google_compute_instance_template" "default" {
-  name        = "appserver-template"
-  description = "This template is used to create app server instances."
+data "google_compute_image" "debian" {
+  family  = "ubuntu-1804-lts"
+  project = "gce-uefi-images"
+}
 
-  tags = ["foo", "bar"]
+# Creates a GCP VM Instance.
+resource "google_compute_instance" "vm" {
+  name         = var.name
+  machine_type = var.machine_type
+  zone         = var.zone
+  tags         = ["http-server"]
+  labels       = var.labels
 
-  labels = {
-    environment = "dev"
-  }
-
-  instance_description = "description assigned to instances"
-  machine_type         = "n1-standard-1"
-  can_ip_forward       = false
-
-  scheduling {
-    automatic_restart   = true
-    on_host_maintenance = "MIGRATE"
-  }
-
-  // Create a new boot disk from an image
-  disk {
-    source_image = "debian-cloud/debian-9"
-    auto_delete  = true
-    boot         = true
-  }
-
-  // Use an existing disk resource
-  disk {
-    // Instance Templates reference disks by name, not self link
-    source      = google_compute_disk.foobar.name
-    auto_delete = false
-    boot        = false
+  boot_disk {
+    initialize_params {
+      image = data.google_compute_image.debian.self_link
+    }
   }
 
   network_interface {
     network = "default"
+    access_config {
+      // Ephemeral IP
+    }
   }
 
-  metadata = {
-    foo = "bar"
-  }
-
-  service_account {
-    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
-  }
+  metadata_startup_script = data.template_file.nginx.rendered
 }
-
-data "google_compute_image" "my_image" {
-  family  = "debian-9"
-  project = "debian-cloud"
-}
-
