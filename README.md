@@ -11,7 +11,7 @@ Crea un job que hace uso de este sharelib para compilar un proyecto java simple 
 - Terraform versión v0.12.26.
 - Cuenta en GCP.
 - Crear una cuenta de servicios y crear una clave del tipo JSON. descargada y guardada en el proyecto
-- Herramientas kubectl 
+
 
 ### Cuenta de Servicio 
 
