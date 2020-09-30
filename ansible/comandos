@@ -1,0 +1,1 @@
+ansible-playbook -i hosts linux_jenkins.yml
