@@ -1,5 +1,5 @@
 echo "-----------------------Building Image Ansible------------------------- "
 docker build -t mi_ansible_image:latest .
 docker run -it mi_ansible_image:latest
-docker ps
+#ansible-playbook -i hosts linux_jenkins.yml
 

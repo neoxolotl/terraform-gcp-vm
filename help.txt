@@ -1,0 +1,66 @@
+1.- terraform + Ansible + docker 
+
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@127.0.0.1
+
+
+
+
+create ssh 
+
+
+cat <<EOF > key.sh
+ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa 2>/dev/null <<< y >/dev/null
+ echo $?    
+EOF 
+sh key.sh 
+
+
+cat <<EOF > distribute_key.yml
+- hosts: all
+  tasks:
+    - authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+EOF
+
+ansible-playbook -i hosts -u root -k key.yaml
+
+
+
+
+
+
+
+
+
+.- deploy jenkins 
+
+
+
+
+
+curl -sSL https://raw.githubusercontent.com/bitnami/bitnami-docker-jenkins/master/docker-compose.yml > docker-compose.yml
+
+docker-compose up -d
+
+
+
+
+
+
+
+
+
+
+
+
+# 1.- start ssh 
+
+ ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa 2>/dev/null <<< y >/dev/null
+ echo $?
+0
+
+# 2.- copy ssh or deploy ansible 
+
+
